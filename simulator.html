@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Techcombank Auto-Earning Simulator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            color: #d10a2d;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        .slider-container {
+            margin-bottom: 20px;
+        }
+
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            margin: 10px 0;
+        }
+
+        .selected-period {
+            text-align: center;
+            font-size: 1rem;
+            margin-top: 10px;
+            font-weight: bold;
+            color: #d10a2d;
+        }
+
+        .result {
+            margin-bottom: 20px;
+            padding: 10px;
+            background: #f1f1f1;
+            border-radius: 6px;
+        }
+
+        .result h2 {
+            font-size: 1.25rem;
+            margin-bottom: 10px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            background-color: #ddd;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress {
+            height: 15px;
+            background-color: #d10a2d;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .info-section {
+            border-top: 1px solid #ccc;
+            padding-top: 10px;
+        }
+
+        .info-section summary {
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .info-section p {
+            margin: 10px 0;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Auto-Earning Simulator</h1>
+
+        <div class="form-group">
+            <label for="balance">Enter Balance Amount:</label>
+            <input type="text" id="balance" placeholder="e.g., 1,000,000" oninput="formatBalanceInput()">
+        </div>
+
+        <div class="slider-container">
+            <label for="timeline">Select Earning Period (months):</label>
+            <input type="range" id="timeline" min="1" max="12" value="6" oninput="updateSelectedPeriod()">
+            <div class="slider-label">
+                <span>1 month</span>
+                <span>12 months</span>
+            </div>
+            <div class="selected-period" id="selected-period">6 months</div>
+        </div>
+
+        <div class="result">
+            <h2>Estimated Interest Earned:</h2>
+            <div class="progress-bar">
+                <div class="progress" id="progress"></div>
+            </div>
+            <p id="interest">VND 0</p>
+        </div>
+
+        <div class="info-section">
+            <details>
+                <summary>How is interest calculated?</summary>
+                <p>The interest is calculated based on the entered balance and selected earning period. It uses a standard annual interest rate of 5%, prorated for the selected period.</p>
+            </details>
+        </div>
+    </div>
+
+    <script>
+        const balanceInput = document.getElementById('balance');
+        const timelineInput = document.getElementById('timeline');
+        const interestDisplay = document.getElementById('interest');
+        const progressBar = document.getElementById('progress');
+        const selectedPeriodDisplay = document.getElementById('selected-period');
+
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+        }
+
+        function formatBalanceInput() {
+            let value = balanceInput.value.replace(/[^\d]/g, '');
+            balanceInput.value = new Intl.NumberFormat('vi-VN').format(value);
+            calculateInterest();
+        }
+
+        function calculateInterest() {
+            const balance = parseFloat(balanceInput.value.replace(/[^\d]/g, '')) || 0;
+            const months = parseInt(timelineInput.value);
+            const annualRate = 0.05;
+            const monthlyRate = annualRate / 12;
+
+            const interest = balance * monthlyRate * months;
+
+            interestDisplay.textContent = formatCurrency(interest);
+
+            const progressPercentage = Math.min((interest / 100000) * 100, 100);
+            progressBar.style.width = `${progressPercentage}%`;
+        }
+
+        function updateSelectedPeriod() {
+            const months = timelineInput.value;
+            selectedPeriodDisplay.textContent = `${months} month${months > 1 ? 's' : ''}`;
+            calculateInterest();
+        }
+
+        timelineInput.addEventListener('input', updateSelectedPeriod);
+
+        calculateInterest();
+    </script>
+</body>
+</html>
